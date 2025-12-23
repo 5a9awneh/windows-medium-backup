@@ -1,0 +1,99 @@
+# Windows Medium Backup
+
+Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V).
+
+## Why?
+
+- ✅ No WSL2 required (pure Hyper-V)
+- ✅ Works with OneDrive
+- ✅ Handles paywall posts (with cookies)
+- ✅ Modern Windows notifications
+- ✅ Task Scheduler automation ready
+
+## Quick Start
+
+### Prerequisites
+- Windows 10/11 Pro/Enterprise/Education
+- Docker Desktop installed
+- Hyper-V enabled
+- PowerShell 5.1+
+
+### Installation
+
+**1. Get Medium Cookies:**
+- Open Medium.com in browser (logged in)
+- Press F12 → Application → Cookies → medium.com
+- Copy `uid` value
+- Copy `sid` value
+
+**2. Build Docker Image:**
+```powershell
+.\Build-ZMediumDocker.ps1 -Username "yourname" -CookieUID "abc123" -CookieSID "def456"
+```
+
+**3. Run Backup:**
+```powershell
+.\Medium-Backup.ps1 -Verbose
+```
+
+Done! Posts saved to `Documents\medium-backup\Output\`
+
+## Documentation
+
+- [**SETUP.md**](SETUP.md) - Detailed setup instructions
+- [**TROUBLESHOOTING.md**](TROUBLESHOOTING.md) - Common issues and solutions
+- [**TASK-SCHEDULER.md**](TASK-SCHEDULER.md) - Automated daily backups
+
+## Output Structure
+
+```
+Documents\medium-backup\Output\
+├── post-title-1\
+│   ├── post-title-1.md
+│   └── images\
+│       ├── image1.jpg
+│       └── image2.png
+└── post-title-2\
+    ├── post-title-2.md
+    └── images\
+```
+
+## Features
+
+- **Automatic Docker management** - Starts Docker if not running
+- **OneDrive compatible** - Handles OneDrive paths automatically
+- **Toast notifications** - Visual feedback when backup completes
+- **Automatic logging** - 30-day log rotation
+- **Error recovery** - Detailed error messages and troubleshooting
+
+## Requirements
+
+### Windows Edition
+- Windows 10/11 Pro, Enterprise, or Education
+- Home editions: Hyper-V not available (WSL2 support planned)
+
+### Software
+- Docker Desktop 4.0+ with Hyper-V backend
+- PowerShell 5.1+ (included in Windows)
+
+## Cookie Expiration
+
+Medium cookies expire after 30-90 days. When backup fails with authentication error:
+1. Get fresh cookies (see above)
+2. Rebuild Docker image with new cookies
+3. Run backup again
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for details.
+
+## Credits
+
+- [**ZMediumToMarkdown**](https://github.com/ZhgChgLi/ZMediumToMarkdown) by ZhgChgLi - Core conversion tool
+- [**BurntToast**](https://github.com/Windos/BurntToast) by Windos - Windows 10 toast notifications
+
+## License
+
+MIT License - See [LICENSE](LICENSE) file for details
+
+## Contributing
+
+This is a simple utility project. Issues and pull requests welcome, but keeping scope minimal.

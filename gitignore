@@ -1,0 +1,31 @@
+# Logs
+*.log
+Medium-Backup-*.log
+
+# Output files
+Output/
+medium-backup/
+
+# Credentials
+*cookie*
+*credentials*
+*secret*
+
+# Docker
+.docker/
+Dockerfile
+Dockerfile.temp
+zmedium-docker-build/
+
+# PowerShell
+*.ps1.backup
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
