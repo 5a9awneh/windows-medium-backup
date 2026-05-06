@@ -1,5 +1,9 @@
 # Windows Medium Backup
 
+<!-- BADGES:START -->
+[![License](https://img.shields.io/github/license/5a9awneh/windows-medium-backup)](LICENSE) [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue?style=flat&logo=powershell)](https://learn.microsoft.com/en-us/powershell/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/) [![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat&logo=windows&logoColor=white)](https://www.microsoft.com/windows) [![Last Commit](https://img.shields.io/github/last-commit/5a9awneh/windows-medium-backup)](https://github.com/5a9awneh/windows-medium-backup/commits/main) [![Output](https://img.shields.io/badge/output-Markdown-blue?style=flat)](https://github.com/5a9awneh/windows-medium-backup) [![Runs Locally](https://img.shields.io/badge/runs_locally-privacy--first-green?style=flat)](https://github.com/5a9awneh/windows-medium-backup) [![Human in the Loop](https://img.shields.io/badge/human--in--the--loop-%E2%9C%93-brightgreen?style=flat)](https://github.com/5a9awneh/windows-medium-backup)
+<!-- BADGES:END -->
+
 Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V).
 
 ## Why?
