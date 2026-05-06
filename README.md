@@ -6,7 +6,7 @@
 
 Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V).
 
-## Why?
+## ❓ Why?
 
 - ✅ No WSL2 required (pure Hyper-V)
 - ✅ Works with OneDrive
@@ -14,7 +14,7 @@ Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper
 - ✅ Modern Windows notifications
 - ✅ Task Scheduler automation ready
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - Windows 10/11 Pro/Enterprise/Education
@@ -42,13 +42,13 @@ Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper
 
 Done! Posts saved to `Documents\medium-backup\Output\`
 
-## Documentation
+## 📚 Documentation
 
 - [**SETUP.md**](SETUP.md) - Detailed setup instructions
 - [**TROUBLESHOOTING.md**](TROUBLESHOOTING.md) - Common issues and solutions
 - [**TASK-SCHEDULER.md**](TASK-SCHEDULER.md) - Automated daily backups
 
-## Output Structure
+## 📁 Output Structure
 
 ```
 Documents\medium-backup\Output\
@@ -62,7 +62,7 @@ Documents\medium-backup\Output\
     └── images\
 ```
 
-## Features
+## ✨ Features
 
 - **Automatic Docker management** - Starts Docker if not running
 - **OneDrive compatible** - Handles OneDrive paths automatically
@@ -70,7 +70,7 @@ Documents\medium-backup\Output\
 - **Automatic logging** - 30-day log rotation
 - **Error recovery** - Detailed error messages and troubleshooting
 
-## Requirements
+## 📋 Requirements
 
 ### Windows Edition
 - Windows 10/11 Pro, Enterprise, or Education
@@ -80,7 +80,7 @@ Documents\medium-backup\Output\
 - Docker Desktop 4.0+ with Hyper-V backend
 - PowerShell 5.1+ (included in Windows)
 
-## Cookie Expiration
+## 🍪 Cookie Expiration
 
 Medium cookies expire after 30-90 days. When backup fails with authentication error:
 1. Get fresh cookies (see above)
@@ -89,15 +89,15 @@ Medium cookies expire after 30-90 days. When backup fails with authentication er
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for details.
 
-## Credits
+## 🙏 Credits
 
 - [**ZMediumToMarkdown**](https://github.com/ZhgChgLi/ZMediumToMarkdown) by ZhgChgLi - Core conversion tool
 - [**BurntToast**](https://github.com/Windos/BurntToast) by Windos - Windows 10 toast notifications
 
-## License
+## 📄 License
 
 MIT License - See [LICENSE](LICENSE) file for details
 
-## Contributing
+## 🤝 Contributing
 
 This is a simple utility project. Issues and pull requests welcome, but keeping scope minimal.
