@@ -6,6 +6,30 @@
 
 Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V).
 
+## 🗺️ How It Works
+
+```mermaid
+flowchart TD
+    Cookies[Get Medium cookies\nuid + sid from browser] --> Build
+    Build[Build-ZMediumDocker.ps1\n--Username --CookieUID --CookieSID] --> Image[Docker image built\nZMediumToMarkdown]
+    Image --> Backup[Medium-Backup.ps1]
+    Backup --> Docker{Docker Desktop\nrunning?}
+    Docker -->|❌ Not running| Start[Auto-start Docker\nwait for engine]
+    Start --> Run
+    Docker -->|✅ Running| Run[Run container\nfetch all posts]
+    Run --> MD[Markdown files\n+ images saved to Output/]
+    MD --> OneDrive[Copy to OneDrive\nDocuments\\medium-backup\\Output]
+    OneDrive --> Toast[Windows toast\nnotification]
+    Toast --> Log[Write to log file\n30-day rotation]
+    Log --> Done([✅ Backup complete])
+
+    Sched[Task Scheduler\noptional daily trigger] -.->|triggers| Backup
+
+    style Docker fill:#7a5500,color:#fff
+    style Done fill:#2d6a2d,color:#fff
+    style Start fill:#7a5500,color:#fff
+```
+
 ## ❓ Why?
 
 - ✅ No WSL2 required (pure Hyper-V)
