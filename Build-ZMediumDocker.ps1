@@ -79,7 +79,8 @@ try {
         throw "Docker not responding"
     }
     Write-Host "✅ Docker is running" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Error "Docker is not running. Start Docker Desktop and try again."
     exit 1
 }
@@ -139,7 +140,8 @@ try {
 
     Write-Host "`n✅ Docker image built successfully!" -ForegroundColor Green
 
-} finally {
+}
+finally {
     # Cleanup
     if (Test-Path $tempDockerfile) {
         Remove-Item $tempDockerfile -Force
@@ -151,7 +153,8 @@ Write-Host "`nVerifying image..." -ForegroundColor Yellow
 $images = docker images zmediumtomarkdown --format "{{.Repository}}:{{.Tag}}" 2>&1
 if ($images -match "zmediumtomarkdown") {
     Write-Host "✅ Image verified: $images" -ForegroundColor Green
-} else {
+}
+else {
     Write-Warning "Image built but verification failed"
 }
 
@@ -159,7 +162,7 @@ Write-Host "`n=== Build Complete ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Run: .\Medium-Backup.ps1 -Verbose" -ForegroundColor White
-Write-Host "  2. Check: Documents\medium-backup\Output\" -ForegroundColor White
+Write-Host "  2. Check: Output\ (next to Medium-Backup.ps1)" -ForegroundColor White
 Write-Host ""
 Write-Host "If backup fails with authentication error:" -ForegroundColor Yellow
 Write-Host "  • Cookies expired - get fresh ones and rebuild" -ForegroundColor White

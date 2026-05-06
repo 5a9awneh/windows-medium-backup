@@ -27,7 +27,7 @@ param(
     [switch]$Unregister
 )
 
-$TaskName  = 'Medium Backup'
+$TaskName = 'Medium Backup'
 $ScriptPath = Join-Path $PSScriptRoot 'Medium-Backup.ps1'
 
 # ── Unregister mode ───────────────────────────────────────────────────────────
@@ -35,7 +35,8 @@ if ($Unregister) {
     if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
         Unregister-ScheduledTask -TaskName $TaskName -Confirm:$false
         Write-Host "`n  ✅ Task '$TaskName' removed.`n" -ForegroundColor Green
-    } else {
+    }
+    else {
         Write-Host "`n  ⚠️  Task '$TaskName' not found.`n" -ForegroundColor Yellow
     }
     exit 0
@@ -54,13 +55,12 @@ Write-Host "  Medium Backup — Task Scheduler Registration" -ForegroundColor Cy
 Write-Host ""
 Write-Host "  Task name : $TaskName"
 Write-Host "  Script    : $ScriptPath"
-Write-Host "  Trigger   : Daily at 9:00 AM (starts when PC has been idle 10 min)"
+Write-Host "  Trigger   : Checks every 2 h; runs when PC has been idle 10+ min"
 Write-Host "  Restarts  : Up to 3 times every 15 min on failure"
 Write-Host "  User      : $env:USERDOMAIN\$env:USERNAME"
 Write-Host ""
 
 # ── Y-default prompt with 5-second countdown ─────────────────────────────────
-$confirmed = $false
 for ($i = 5; $i -ge 1; $i--) {
     Write-Host "`r  Create scheduled task? [Y/n] (auto-yes in ${i}s)  " -NoNewline -ForegroundColor Yellow
     if ([Console]::KeyAvailable) {
@@ -69,7 +69,6 @@ for ($i = 5; $i -ge 1; $i--) {
             Write-Host "`n`n  Skipped. Run Medium-Backup.ps1 manually whenever needed.`n" -ForegroundColor Gray
             exit 0
         }
-        $confirmed = $true
         break
     }
     Start-Sleep -Seconds 1
@@ -87,7 +86,12 @@ $action = New-ScheduledTaskAction `
     -Execute 'powershell.exe' `
     -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$ScriptPath`""
 
-$trigger = New-ScheduledTaskTrigger -Daily -At '09:00'
+# Trigger: fires just after midnight, then repeats every 2 hours for 24 hours.
+# Combined with RunOnlyIfIdle + StartWhenAvailable, this gives ~12 opportunistic
+# windows per day — the task runs during whichever window the PC is idle.
+$trigger = New-ScheduledTaskTrigger -Once -At '00:01' `
+    -RepetitionInterval (New-TimeSpan -Hours 2) `
+    -RepetitionDuration (New-TimeSpan -Days 1)
 
 $settings = New-ScheduledTaskSettingsSet `
     -ExecutionTimeLimit  (New-TimeSpan -Hours 1) `
@@ -95,7 +99,7 @@ $settings = New-ScheduledTaskSettingsSet `
     -RestartInterval     (New-TimeSpan -Minutes 15) `
     -RunOnlyIfIdle `
     -IdleDuration        (New-TimeSpan -Minutes 10) `
-    -IdleWaitTimeout     (New-TimeSpan -Hours 2) `
+    -IdleWaitTimeout     (New-TimeSpan -Minutes 90) `
     -MultipleInstances   IgnoreNew `
     -StartWhenAvailable
 
@@ -115,6 +119,6 @@ Register-ScheduledTask `
 
 Write-Host ""
 Write-Host "  ✅ Task '$TaskName' created successfully!" -ForegroundColor Green
-Write-Host "  📅 Will run daily at 9:00 AM when PC is idle for 10+ minutes" -ForegroundColor Cyan
+Write-Host "  🌙 Runs opportunistically — checks every 2 h, executes when idle 10+ min" -ForegroundColor Cyan
 Write-Host "  🗑  To remove: .\Register-Task.ps1 -Unregister" -ForegroundColor Cyan
 Write-Host ""

@@ -18,12 +18,13 @@ flowchart TD
     Start --> Run
     Docker -->|✅ Running| Run[Run container\nfetch all posts]
     Run --> MD[Markdown files\n+ images saved to Output/]
-    MD --> OneDrive[Copy to OneDrive\nDocuments\\medium-backup\\Output]
-    OneDrive --> Toast[Windows toast\nnotification]
+    MD --> Restructure[Restructure into\nper-article folders\nfix asset paths]
+    Restructure --> OutDir[Output/ next to script]
+    OutDir --> Toast[Windows toast\nnotification]
     Toast --> Log[Write to log file\n30-day rotation]
     Log --> Done([✅ Backup complete])
 
-    Sched[Task Scheduler\noptional daily trigger] -.->|triggers| Backup
+    Sched[Register-Task.ps1\noptional daily trigger] -.->|triggers| Backup
 
     style Docker fill:#7a5500,color:#fff
     style Done fill:#2d6a2d,color:#fff
@@ -33,7 +34,6 @@ flowchart TD
 ## ❓ Why?
 
 - ✅ No WSL2 required (pure Hyper-V)
-- ✅ Works with OneDrive
 - ✅ Handles paywall posts (with cookies)
 - ✅ Modern Windows notifications
 - ✅ Task Scheduler automation ready
@@ -116,7 +116,7 @@ Each article gets its own folder. Assets are co-located and image paths in the M
 ## ✨ Features
 
 - **Automatic Docker management** - Starts Docker if not running
-- **OneDrive compatible** - Handles OneDrive paths automatically
+- **Portable output** - Saves next to the script; works inside OneDrive-synced folders too
 - **Toast notifications** - Visual feedback when backup completes
 - **Automatic logging** - 30-day log rotation
 - **Error recovery** - Detailed error messages and troubleshooting

@@ -142,6 +142,7 @@ With your Medium username and cookies ready:
 📊 Articles: 15 (each in its own folder)
 📝 Log: Medium-Backup-20251223.log
 ```
+_(Actual path depends on where the script is saved.)_
 
 **Time:** 1-5 minutes depending on number of posts and images
 

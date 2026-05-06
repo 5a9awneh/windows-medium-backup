@@ -17,7 +17,7 @@
     - Docker Desktop with Hyper-V backend
     - Docker image built via Build-ZMediumDocker.ps1
 
-    Output: Documents\medium-backup\Output\
+    Output: <script-dir>\Output\
     Logs: Medium-Backup-YYYYMMDD.log
 
     See TROUBLESHOOTING.md if issues occur.
@@ -39,6 +39,7 @@ $DockerImageName = "zmediumtomarkdown"
 # Logging setup
 $LogDate = Get-Date -Format "yyyyMMdd"
 $LogFile = Join-Path $PSScriptRoot "Medium-Backup-$LogDate.log"
+$DoneFile = Join-Path $PSScriptRoot "Medium-Backup-$LogDate.done"
 
 function Write-Log {
     param(
@@ -51,9 +52,9 @@ function Write-Log {
     Add-Content -Path $LogFile -Value $LogEntry -Encoding UTF8
 
     switch ($Level) {
-        "ERROR"   { Write-Error $Message }
+        "ERROR" { Write-Error $Message }
         "WARNING" { Write-Warning $Message }
-        default   { Write-Verbose $Message }
+        default { Write-Verbose $Message }
     }
 }
 
@@ -62,8 +63,13 @@ function Remove-OldLogs {
 
     $CutoffDate = (Get-Date).AddDays(-$DaysToKeep)
     Get-ChildItem -Path $PSScriptRoot -Filter "Medium-Backup-*.log" | 
-        Where-Object { $_.LastWriteTime -lt $CutoffDate } | 
-        Remove-Item -Force -ErrorAction SilentlyContinue
+    Where-Object { $_.LastWriteTime -lt $CutoffDate } | 
+    Remove-Item -Force -ErrorAction SilentlyContinue
+
+    # Also clean up matching .done stamps
+    Get-ChildItem -Path $PSScriptRoot -Filter "Medium-Backup-*.done" |
+    Where-Object { $_.LastWriteTime -lt $CutoffDate } |
+    Remove-Item -Force -ErrorAction SilentlyContinue
 }
 
 function Install-BurntToast {
@@ -72,12 +78,14 @@ function Install-BurntToast {
             Write-Log "Installing BurntToast module..."
             Install-Module BurntToast -Scope CurrentUser -Force -Repository PSGallery
             Write-Log "BurntToast module installed"
-        } else {
+        }
+        else {
             Write-Log "BurntToast module already installed"
         }
         Import-Module BurntToast -ErrorAction Stop
         return $true
-    } catch {
+    }
+    catch {
         Write-Log "Failed to install/import BurntToast: $_" -Level WARNING
         return $false
     }
@@ -97,7 +105,8 @@ function Show-Notification {
         if (Get-Module -Name BurntToast -ErrorAction SilentlyContinue) {
             New-BurntToastNotification -Text $Title, $Message -ErrorAction SilentlyContinue
         }
-    } catch {
+    }
+    catch {
         Write-Log "Toast notification failed: $_" -Level WARNING
     }
 }
@@ -109,7 +118,8 @@ function Test-DockerRunning {
             Write-Log "Docker already running"
             return $true
         }
-    } catch {}
+    }
+    catch {}
 
     Write-Log "Docker not running, attempting to start..." -Level WARNING
 
@@ -134,7 +144,8 @@ function Test-DockerRunning {
                 Start-Sleep -Seconds 10
                 return $true
             }
-        } catch {}
+        }
+        catch {}
 
         Write-Log "Still waiting for Docker... ($elapsed/$timeout seconds)"
     }
@@ -230,7 +241,8 @@ function Invoke-Backup {
         $drive = $matches[1].ToLower()
         $path = $matches[2]
         $dockerPath = "/$drive$path"
-    } else {
+    }
+    else {
         $dockerPath = $OutputPathNormalized
     }
 
@@ -239,7 +251,7 @@ function Invoke-Backup {
 
     # Run Docker container
     $dockerOutput = docker run --rm `
-        -v "${OutputPath}:/app/output" `
+        -v "${dockerPath}:/app/output" `
         $DockerImageName 2>&1
 
     $exitCode = $LASTEXITCODE
@@ -259,7 +271,8 @@ function Invoke-Backup {
     if ($fileCount -gt 0) {
         Write-Log "Generated $fileCount markdown files"
         return $fileCount
-    } else {
+    }
+    else {
         Write-Log "No markdown files found in output" -Level WARNING
         return 0
     }
@@ -269,6 +282,12 @@ function Invoke-Backup {
 try {
     Write-Log "=== Medium Backup Started ==="
     Write-Log "Version: $ScriptVersion"
+
+    # Skip if already ran successfully today (task scheduler may trigger multiple times)
+    if (Test-Path $DoneFile) {
+        Write-Log "Backup already completed today — skipping"
+        exit 0
+    }
 
     # Clean old logs
     Remove-OldLogs -DaysToKeep 30
@@ -286,8 +305,10 @@ try {
         throw "Docker image '$DockerImageName' not found. Run Build-ZMediumDocker.ps1 first."
     }
 
-    # Output lands next to the script
+    # Output lands next to the script (works regardless of OneDrive sync settings)
     $OutputPath = Join-Path $PSScriptRoot 'Output'
+    # To redirect output to Documents (which may sync to OneDrive), comment the line above and use:
+    # $OutputPath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'medium-backup\Output'
     Write-Log "Output location: $OutputPath"
 
     # Run backup
@@ -298,10 +319,11 @@ try {
 
     # Success
     Write-Log "=== Medium Backup Completed Successfully ==="
+    New-Item -Path $DoneFile -ItemType File -Force | Out-Null  # prevent re-runs today
 
     if ($notificationsEnabled) {
         Show-Notification -Title "Medium Backup Complete" `
-            -Message "Successfully backed up $fileCount posts to $OutputPath" `
+            -Message "Successfully backed up $restructured posts to $OutputPath" `
             -Type Success
     }
 
@@ -310,7 +332,8 @@ try {
     Write-Host "📊 Articles: $restructured (each in its own folder)" -ForegroundColor Cyan
     Write-Host "📝 Log: $LogFile" -ForegroundColor Cyan
 
-} catch {
+}
+catch {
     Write-Log $_.Exception.Message -Level ERROR
     Write-Log $_.ScriptStackTrace -Level ERROR
 
