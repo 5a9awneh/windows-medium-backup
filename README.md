@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/github/license/5a9awneh/windows-medium-backup)](LICENSE) [![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue?style=flat&logo=powershell)](https://learn.microsoft.com/en-us/powershell/) [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/) [![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat&logo=windows&logoColor=white)](https://www.microsoft.com/windows) [![Last Commit](https://img.shields.io/github/last-commit/5a9awneh/windows-medium-backup)](https://github.com/5a9awneh/windows-medium-backup/commits/main) [![Output](https://img.shields.io/badge/output-Markdown-blue?style=flat)](https://github.com/5a9awneh/windows-medium-backup) [![Runs Locally](https://img.shields.io/badge/runs_locally-privacy--first-green?style=flat)](https://github.com/5a9awneh/windows-medium-backup) [![Human in the Loop](https://img.shields.io/badge/human--in--the--loop-%E2%9C%93-brightgreen?style=flat)](https://github.com/5a9awneh/windows-medium-backup)
 <!-- BADGES:END -->
 
-Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V).
+Automated Medium post backup to Markdown for Windows using Docker Desktop (Hyper-V), powered by [ZMediumToMarkdown](https://github.com/ZhgChgLi/ZMediumToMarkdown).
 
 ## 🗺️ How It Works
 
@@ -69,7 +69,7 @@ flowchart TD
 ```
 VERBOSE: Checking Docker Desktop status...
 VERBOSE: Docker Desktop is running.
-VERBOSE: Resolving OneDrive path: C:\Users\yourname\OneDrive\Documents\medium-backup
+VERBOSE: Output location: C:\Users\yourname\windows-medium-backup\Output
 VERBOSE: Starting ZMediumToMarkdown container for user: yourname
 VERBOSE: Downloading posts...
 
@@ -79,34 +79,39 @@ VERBOSE: Downloading posts...
   ...
   [12/12] getting-started-with-pester-5.md                     ✓
 
-VERBOSE: Copying output to OneDrive: Documents\medium-backup\Output\
-VERBOSE: Writing log: medium-backup-2026-05-06.log
+VERBOSE: Restructuring 12 articles into per-article folders...
+VERBOSE: Writing log: Medium-Backup-20260506.log
 VERBOSE: Sending toast notification...
 
-Backup complete. 12 posts saved to Documents\medium-backup\Output\
+✅ Backup completed successfully!
+📁 Location: C:\Users\yourname\windows-medium-backup\Output
+📊 Articles: 12 (each in its own folder)
+📝 Log: Medium-Backup-20260506.log
 ```
 
-Done! Posts saved to `Documents\medium-backup\Output\`
+Done! Posts saved to `Output\` next to the script.
 
 ## 📚 Documentation
 
 - [**SETUP.md**](SETUP.md) - Detailed setup instructions
 - [**TROUBLESHOOTING.md**](TROUBLESHOOTING.md) - Common issues and solutions
-- [**TASK-SCHEDULER.md**](TASK-SCHEDULER.md) - Automated daily backups
+- [**TASK-SCHEDULER.md**](TASK-SCHEDULER.md) - Automated daily backups via `Register-Task.ps1`
 
 ## 📁 Output Structure
 
 ```
-Documents\medium-backup\Output\
-├── post-title-1\
-│   ├── post-title-1.md
-│   └── images\
-│       ├── image1.jpg
-│       └── image2.png
-└── post-title-2\
-    ├── post-title-2.md
-    └── images\
+Output\
+├── 2024-07-10-remove-sensitive-data-1ad65c2593f7\
+│   ├── 2024-07-10-remove-sensitive-data-1ad65c2593f7.md
+│   └── assets\
+│       └── image.png
+└── 2025-12-20-google-ai-product-chaos-e35dc04a7a4d\
+    ├── 2025-12-20-google-ai-product-chaos-e35dc04a7a4d.md
+    └── assets\
+        └── image.jpg
 ```
+
+Each article gets its own folder. Assets are co-located and image paths in the Markdown are rewritten automatically.
 
 ## ✨ Features
 

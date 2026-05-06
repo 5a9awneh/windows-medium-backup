@@ -156,6 +156,64 @@ function Test-DockerImage {
     return $false
 }
 
+function Invoke-Restructure {
+    param([string]$OutputPath)
+
+    # ZMediumToMarkdown hardcodes output to users/<username>/zmediumtomarkdown/ inside the mount
+    $zmFolder = Get-ChildItem -Path $OutputPath -Filter 'zmediumtomarkdown' -Recurse -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    if (-not $zmFolder) {
+        Write-Log 'No zmediumtomarkdown folder found — skipping restructure' 'WARNING'
+        return 0
+    }
+
+    Write-Log "Restructuring output from: $($zmFolder.FullName)"
+
+    $mdFiles = Get-ChildItem -Path $zmFolder.FullName -Filter '*.md' -File
+    $assetsRoot = Join-Path $zmFolder.FullName 'assets'
+    $restructured = 0
+
+    foreach ($md in $mdFiles) {
+        $slug = $md.BaseName
+        # Post ID is the last segment after the final dash (12-char Medium post hash)
+        $postId = ($slug -split '-')[-1]
+
+        $articleDir = Join-Path $OutputPath $slug
+        New-Item -ItemType Directory -Path $articleDir -Force | Out-Null
+
+        # Move .md into its own folder
+        $destMd = Join-Path $articleDir $md.Name
+        Move-Item -Path $md.FullName -Destination $destMd -Force
+
+        # Move matching assets sub-folder contents to article's assets/
+        $postAssets = Join-Path $assetsRoot $postId
+        if (Test-Path $postAssets) {
+            $articleAssets = Join-Path $articleDir 'assets'
+            New-Item -ItemType Directory -Path $articleAssets -Force | Out-Null
+            Get-ChildItem -Path $postAssets | Move-Item -Destination $articleAssets -Force
+            Remove-Item -Path $postAssets -Force -ErrorAction SilentlyContinue
+        }
+
+        # Rewrite image refs: assets/<postId>/ -> assets/
+        $content = Get-Content $destMd -Raw -Encoding UTF8
+        $updated = $content -replace "assets/$postId/", 'assets/'
+        if ($updated -ne $content) {
+            Set-Content -Path $destMd -Value $updated -Encoding UTF8 -NoNewline
+        }
+
+        $restructured++
+    }
+
+    # Remove the now-empty users/ nesting
+    $usersDir = Join-Path $OutputPath 'users'
+    if (Test-Path $usersDir) {
+        Remove-Item -Path $usersDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    Write-Log "Restructured $restructured articles into per-article folders"
+    return $restructured
+}
+
 function Invoke-Backup {
     param([string]$OutputPath)
 
@@ -228,16 +286,15 @@ try {
         throw "Docker image '$DockerImageName' not found. Run Build-ZMediumDocker.ps1 first."
     }
 
-    # Determine output path (handles OneDrive automatically)
-    $DocumentsPath = [Environment]::GetFolderPath('MyDocuments')
-    $BackupRoot = Join-Path $DocumentsPath "medium-backup"
-    $OutputPath = Join-Path $BackupRoot "Output"
-
-    Write-Log "Documents path: $DocumentsPath"
-    Write-Log "Backup location: $OutputPath"
+    # Output lands next to the script
+    $OutputPath = Join-Path $PSScriptRoot 'Output'
+    Write-Log "Output location: $OutputPath"
 
     # Run backup
     $fileCount = Invoke-Backup -OutputPath $OutputPath
+
+    # Flatten ZMediumToMarkdown nesting and group each article with its assets
+    $restructured = Invoke-Restructure -OutputPath $OutputPath
 
     # Success
     Write-Log "=== Medium Backup Completed Successfully ==="
@@ -250,7 +307,7 @@ try {
 
     Write-Host "`n✅ Backup completed successfully!" -ForegroundColor Green
     Write-Host "📁 Location: $OutputPath" -ForegroundColor Cyan
-    Write-Host "📊 Files: $fileCount markdown files" -ForegroundColor Cyan
+    Write-Host "📊 Articles: $restructured (each in its own folder)" -ForegroundColor Cyan
     Write-Host "📝 Log: $LogFile" -ForegroundColor Cyan
 
 } catch {

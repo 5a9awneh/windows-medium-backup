@@ -105,8 +105,6 @@ Error response from daemon: error while creating mount source path
 6. Wait 2-3 minutes
 7. Run backup again
 
-**For OneDrive users:** No special configuration needed, script handles OneDrive paths automatically.
-
 ---
 
 ## No Toast Notification
@@ -150,10 +148,11 @@ Install-Module BurntToast -Scope CurrentUser -Force
 - See "Cookie or Authentication Errors" above
 
 ### 4. Output path issue
-Verify output path:
+Verify output path (Output\ is created next to Medium-Backup.ps1):
 ```powershell
-$DocumentsPath = [Environment]::GetFolderPath('MyDocuments')
-$OutputPath = Join-Path $DocumentsPath "medium-backup\Output"
+# Output is saved next to the script:
+$ScriptDir = Split-Path $MyInvocation.MyCommand.Path
+$OutputPath = Join-Path $ScriptDir 'Output'
 Write-Host $OutputPath
 # Navigate to this path in File Explorer
 ```
@@ -296,8 +295,8 @@ docker info
 # Check Docker images
 docker images
 
-# Check output path
-[Environment]::GetFolderPath('MyDocuments')
+# Check output path (next to Medium-Backup.ps1)
+Join-Path (Split-Path $MyInvocation.MyCommand.Path) 'Output'
 
 # Test Docker with simple container
 docker run --rm alpine:latest echo "Docker works"

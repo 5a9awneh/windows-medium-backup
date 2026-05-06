@@ -128,17 +128,18 @@ With your Medium username and cookies ready:
 **What happens:**
 1. Checks Docker is running (starts it if not)
 2. Verifies Docker image exists
-3. Creates output directory: `Documents\medium-backup\Output\`
+3. Creates output directory: `Output\` (next to the script)
 4. Runs Docker container to download posts
 5. Converts posts to Markdown with images
-6. Shows toast notification when done
-7. Creates log file: `Medium-Backup-YYYYMMDD.log`
+6. Restructures output into per-article folders
+7. Shows toast notification when done
+8. Creates log file: `Medium-Backup-YYYYMMDD.log`
 
 **Expected output:**
 ```
 ✅ Backup completed successfully!
-📁 Location: C:\Users\YourName\Documents\medium-backup\Output
-📊 Files: 15 markdown files
+📁 Location: C:\Users\YourName\windows-medium-backup\Output
+📊 Articles: 15 (each in its own folder)
 📝 Log: Medium-Backup-20251223.log
 ```
 
@@ -146,39 +147,28 @@ With your Medium username and cookies ready:
 
 ## Verify Output
 
-Navigate to: `Documents\medium-backup\Output\`
+Navigate to the `Output\` folder next to the script.
 
 **Structure:**
 ```
 Output\
-├── post-title-1\
-│   └── images\
-│       ├── image1.jpg
-│       └── image2.png
-├── post-title-2\
-│   └── images\
-└── ...
+├── 2024-07-10-post-slug-1ad65c2593f7\
+│   ├── 2024-07-10-post-slug-1ad65c2593f7.md
+│   └── assets\
+│       └── image.png
+└── 2025-12-20-another-post-e35dc04a7a4d\
+    ├── 2025-12-20-another-post-e35dc04a7a4d.md
+    └── assets\
+        └── image.jpg
 ```
 
-Each post's images are in own folder
+Each article has its own folder. Image paths in the Markdown files are automatically rewritten to be relative to the article folder.
 
 **Open a .md file** in any text editor or Markdown viewer to verify content.
 
-## OneDrive Users
-
-Script automatically detects OneDrive paths. No special configuration needed.
-
-**OneDrive path examples:**
-```
-C:\Users\YourName\OneDrive\Documents\medium-backup\
-C:\Users\YourName\OneDrive - Company\Documents\medium-backup\
-```
-
-Both work automatically.
-
 ## Next Steps
 
-- **Automation:** See [TASK-SCHEDULER.md](TASK-SCHEDULER.md) to schedule daily backups
+- **Automation:** Run `Register-Task.ps1` to schedule daily backups (prompts for confirmation)
 - **Troubleshooting:** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) if issues occur
 - **Updates:** When cookies expire, rebuild Docker image with fresh cookies
 

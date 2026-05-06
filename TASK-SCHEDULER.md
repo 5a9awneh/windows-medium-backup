@@ -12,84 +12,20 @@ Task Scheduler runs the backup script automatically at scheduled times, even whe
 - Runs silently in background
 - Toast notification on completion
 
-## Setup Instructions
+## Setup
 
-### 1. Open Task Scheduler
+Run `Register-Task.ps1` — it creates the task automatically with recommended settings:
 
-Press **Win + R**, type `taskschd.msc`, press Enter.
+```powershell
+.\Register-Task.ps1
+```
 
-### 2. Create Basic Task
+You'll see a summary of what will be created and a 5-second confirmation prompt (Y is the default). The task runs daily at 9:00 AM when the PC has been idle for 10 minutes.
 
-1. In right panel, click **"Create Basic Task"**
-2. **Name:** `Medium Backup`
-3. **Description:** `Daily automated Medium post backup`
-4. Click **Next**
-
-### 3. Set Trigger (When to Run)
-
-1. Select **"Daily"**
-2. **Start date:** Today's date
-3. **Start time:** `9:00 AM` (or your preference)
-4. **Recur every:** `1` days
-5. Click **Next**
-
-### 4. Set Action (What to Run)
-
-1. Select **"Start a program"**
-2. Click **Next**
-3. **Program/script:**
-   ```
-   powershell.exe
-   ```
-4. **Add arguments:**
-   ```
-   -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\full\path\to\Medium-Backup.ps1"
-   ```
-   **Replace** `C:\full\path\to\` with actual path to your script
-
-   **Example:**
-   ```
-   -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\Users\YourName\Downloads\Medium-Backup.ps1"
-   ```
-5. Click **Next**
-6. Click **Finish**
-
-### 5. Advanced Settings (Optional but Recommended)
-
-Find your task in **Task Scheduler Library**, right-click, select **Properties**.
-
-#### General Tab
-- ✅ Check "Run whether user is logged on or not"
-- ✅ Check "Run with highest privileges"
-- Select "Configure for: Windows 10" (or Windows 11)
-
-#### Triggers Tab
-Click **Edit** on your trigger:
-
-**Repeat task:**
-- ✅ Check "Repeat task every: **1 hour**"
-- For a duration of: **8 hours**
-- This runs at 9 AM, 10 AM, 11 AM... until 5 PM (picks best time when PC is idle)
-
-**Stop task if runs longer than:**
-- Set to **30 minutes** (safety measure)
-
-#### Conditions Tab
-- ✅ "Start only if the computer is idle for: **10 minutes**"
-- ✅ "Wait for idle for: **2 hours**"
-- ✅ "Start the task only if the computer is on AC power" (laptops)
-- ❌ Uncheck "Stop if computer switches to battery power"
-
-These settings prevent backup from interrupting your work.
-
-#### Settings Tab
-- ✅ "Allow task to be run on demand"
-- ✅ "Run task as soon as possible after a scheduled start is missed"
-- ✅ "If the task fails, restart every: **15 minutes**"
-- ✅ "Attempt to restart up to: **3 times**"
-- ✅ "Stop the task if it runs longer than: **1 hour**"
-
-Click **OK** to save.
+**To remove the task:**
+```powershell
+.\Register-Task.ps1 -Unregister
+```
 
 ## Test the Task
 
@@ -98,7 +34,7 @@ Click **OK** to save.
 1. Find your task in Task Scheduler Library
 2. Right-click → **"Run"**
 3. Watch for toast notification
-4. Check output folder: `Documents\medium-backup\Output\`
+4. Check output folder: `Output\` (next to `Medium-Backup.ps1`)
 5. Check log file: `Medium-Backup-YYYYMMDD.log`
 
 ### Verify Scheduled Execution
@@ -223,6 +159,13 @@ This starts Docker, waits 2 minutes, then runs backup.
 3. Re-enable when ready
 
 ### Permanently Remove
+
+The quick way:
+```powershell
+.\Register-Task.ps1 -Unregister
+```
+
+Or manually in Task Scheduler:
 1. Task Scheduler → Find task
 2. Right-click → **"Delete"**
 
