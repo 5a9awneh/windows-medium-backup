@@ -64,6 +64,28 @@ flowchart TD
 .\Medium-Backup.ps1 -Verbose
 ```
 
+**Sample run:**
+
+```
+VERBOSE: Checking Docker Desktop status...
+VERBOSE: Docker Desktop is running.
+VERBOSE: Resolving OneDrive path: C:\Users\yourname\OneDrive\Documents\medium-backup
+VERBOSE: Starting ZMediumToMarkdown container for user: yourname
+VERBOSE: Downloading posts...
+
+  [1/12] the-hidden-registry-key-that-blocks-windows-hello.md  ✓
+  [2/12] automating-medium-backup-on-windows.md                ✓
+  [3/12] why-your-printer-address-book-wont-import.md          ✓
+  ...
+  [12/12] getting-started-with-pester-5.md                     ✓
+
+VERBOSE: Copying output to OneDrive: Documents\medium-backup\Output\
+VERBOSE: Writing log: medium-backup-2026-05-06.log
+VERBOSE: Sending toast notification...
+
+Backup complete. 12 posts saved to Documents\medium-backup\Output\
+```
+
 Done! Posts saved to `Documents\medium-backup\Output\`
 
 ## 📚 Documentation
